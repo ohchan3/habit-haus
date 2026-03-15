@@ -69,85 +69,48 @@ function compressImage(file,maxW=500,q=0.75){
   });
 }
 
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
-async function callAPI(system,user,maxTokens=400){
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","x-api-key":API_KEY,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-      body:JSON.stringify({model:"claude-opus-4-5",max_tokens:maxTokens,system,messages:[{role:"user",content:user}]}),
-    });
-    const d=await res.json();
-    return d.content?.map(b=>b.text||"").join("")||"";
-  }catch{return "";}
-}
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
 
-async function callHabitOshi(habitLabel,success,oshi,stageName,stageSpirit,streak,pts){
-  const angles = success ? [
-    "今日の達成を、詩的に情熱的に表現して",
-    "まるで手紙を書くように、温かく丁寧に伝えて",
-    "友達に話しかけるように、自然なトーンで褒めて",
-    "短くてもインパクトのある、心に刺さる一言から始めて",
-    "連続記録に注目して、その積み重ねの凄さを伝えて",
-    "習慣の内容に寄り添って、具体的にその行動を称えて",
-  ] : [
-    "雨の日の傘のように、そっと寄り添う言葉で",
-    "明日への期待を膨らませるように、前向きな未来を描いて",
-    "できなかった理由を責めず、次の一歩だけに集中して",
-    "短くシンプルに、でも心に残る慰めの言葉で",
-    "ユーモアを少し交えて、軽やかに励ましてみて",
-    "その人の頑張りをちゃんと見ていると伝えるように",
+function callHabitOshi(habitLabel,success,oshi,stageName,stageSpirit,streak,pts){
+  const successMsgs = [
+    `「${habitLabel}」やり遂げたね。${stageSpirit}。${oshi.name}はあなたのこと、ちゃんと見てるよ ✨`,
+    `${streak}日続いてる。それがどれだけすごいことか、${oshi.name}は知ってる。今日もありがとう 🌸`,
+    `${stageSpirit}。その言葉通り、あなたは今日も前へ進んだ 💫`,
+    `「${habitLabel}」達成！小さな一歩が、大きな未来をつくっていく。${oshi.name}より 🎵`,
+    `続けることの美しさを、あなたは体で証明してる。今日も最高だよ ⭐`,
+    `${pts}pt積み上げてきたね。その重さを、${oshi.name}はちゃんとわかってる 🌟`,
   ];
-  const angle = angles[Math.floor(Math.random() * angles.length)];
-  const sys=`あなたは「${oshi.name}」です。性格：${oshi.personality}
-嵐の曲「${stageName}」の世界観でメッセージを送ってください。
-この曲の精神：「${stageSpirit}」
-${success?"習慣を達成した喜びを称えてください。":"できなかった日を慰め、明日への希望を持たせてください。"}
-今回のメッセージのスタイル：「${angle}」
-・日本語2〜3文
-・毎回違う言葉・表現を使う（同じフレーズを繰り返さない）
-・曲の世界観を自然に盛り込む
-・絵文字1〜2個`;
-  const msg=success
-    ?`「${habitLabel}」達成！${streak}日連続、${pts}pt、ステージ「${stageName}」`
-    :`「${habitLabel}」今日はできなかった。${pts}pt、ステージ「${stageName}」`;
-  return await callAPI(sys,msg)||(success?`すごい！${oshi.name}も誇りに思う！✨`:"大丈夫、明日また！💪");
-}
-
-async function callSavingsOshi(amount,totalSavings,oshi,stageName,stageSpirit){
-  const angles = [
-    "節約した金額の大きさよりも、その決断の勇気を褒めて",
-    "夢に近づいている実感を、情景を描くように伝えて",
-    "小さな積み重ねが奇跡を生む、という視点で語って",
-    "推し活という目標があるからこそ頑張れる、と共感して",
-    "今日節約した分だけ、未来が輝いていると伝えて",
-    "まるでその場にいるかのように、一緒に喜んでみせて",
-    "累計金額に注目して、ここまで来た道のりを称えて",
+  const failMsgs = [
+    `できない日もあっていい。それも含めて、あなたの物語だから。明日また一緒にね 🖤`,
+    `${stageSpirit}。この言葉を胸に、また明日から始めよう 💙`,
+    `今日休んだ分、明日の自分が動いてくれる。${oshi.name}はずっと待ってるよ 🌙`,
+    `大丈夫。転んでも、また立てる。それがあなたの強さだって知ってる 🌸`,
+    `完璧じゃなくていい。また明日、「できた！」って言いに来て ✨`,
+    `今日はゆっくり休んで。明日のあなたに期待してる。${oshi.name}より 💫`,
   ];
-  const angle = angles[Math.floor(Math.random() * angles.length)];
-  const sys=`あなたは「${oshi.name}」です。性格：${oshi.personality}
-節約記録への応援メッセージを送ってください。
-この曲の精神：「${stageSpirit}」（嵐「${stageName}」）
-今回のスタイル：「${angle}」
-・日本語2〜3文
-・毎回違う表現・切り口で（同じフレーズを使い回さない）
-・「${stageName}」の温かさや世界観を自然に織り込む
-・絵文字1〜2個`;
-  const msg=`${formatYen(amount)}節約！累計${formatYen(totalSavings)}。ステージ「${stageName}」`;
-  return await callAPI(sys,msg)||`${oshi.name}：${formatYen(amount)}の節約、素晴らしい！💰✨`;
+  return Promise.resolve(pick(success ? successMsgs : failMsgs));
 }
 
-async function callOshiLetter(spentAmount,totalSavings,oshi,savStage){
-  const sys=`あなたは「${oshi.name}」です。性格：${oshi.personality}
-ユーザーが節約貯金を推し活に使いました。特別なお手紙を書いてください。
-・200〜250文字、手紙らしく温かく
-・節約の努力を称え、推し活を全力で楽しんでほしい気持ちを込める
-・これからも節約・推し活・日々の生活を前向きに過ごせる言葉
-・「${savStage.spirit}」を自然に盛り込む
-・最後は「${oshi.name}より」で締める
-絵文字は最小限に。手紙形式で。`;
-  const msg=`推し活に${formatYen(spentAmount)}使った！累計節約額${formatYen(totalSavings)}。ステージ「${savStage.name}」`;
-  return await callAPI(sys,msg,600)||`${oshi.name}より\n\nあなたが毎日コツコツ積み上げてきた${formatYen(spentAmount)}を、大好きな推し活に使ったんですね。その選択を、心から応援しています。これからも一緒に、毎日を前向きに歩んでいきましょう。\n\n${oshi.name}より`;
+function callSavingsOshi(amount,totalSavings,oshi,stageName,stageSpirit){
+  const msgs = [
+    `${formatYen(amount)}の節約、積み重なっていく。${stageSpirit}。あなたの努力が輝いてる 💰`,
+    `今日も${formatYen(amount)}、夢に近づいた。累計${formatYen(totalSavings)}。${oshi.name}はずっと応援してるよ ✨`,
+    `${stageSpirit}。その言葉そのままに、あなたは今日も一歩前へ 🌸`,
+    `コツコツ続けること、それが一番強い。${formatYen(amount)}の節約、素晴らしい 💫`,
+    `${formatYen(totalSavings)}まで来た。この道のりを、${oshi.name}は誇りに思う ⭐`,
+    `小さな節約が大きな夢になる。今日の${formatYen(amount)}もちゃんと届いてるよ 🎵`,
+    `推し活のために頑張れる。それってすごく素敵なことだと思う 🌟`,
+  ];
+  return Promise.resolve(pick(msgs));
+}
+
+async funfunction callOshiLetter(spentAmount,totalSavings,oshi,savStage){
+  const letters = [
+    `${oshi.name}より\n\nコツコツ積み上げてきた${formatYen(spentAmount)}を、大好きな推し活に使ったんですね。その選択を、心から応援しています。\n\n${savStage.spirit}。あなたが笑顔でいることが、私にとっても一番うれしいことです。これからも一緒に、毎日を前向きに歩んでいきましょう。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n推し活、楽しんできてね。あなたが毎日少しずつ節約して、この日のために準備してきたこと、ちゃんと知ってます。\n\n${savStage.spirit}。その気持ちを胸に、思いっきり楽しんできてください。また節約の旅、一緒に始めよう。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n${formatYen(spentAmount)}分の夢を、今日叶えたんですね。おめでとう。\n\n積み上げてきた時間と気持ちが、今日の笑顔になった。${savStage.spirit}。これからもあなたの隣で、ずっと応援しています。\n\n${oshi.name}より`,
+  ];
+  return Promise.resolve(pick(letters));
 }
 
 function Sparkles({color,n=5}){
