@@ -70,47 +70,62 @@ function compressImage(file,maxW=500,q=0.75){
 }
 
 const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const lastMsgIdx = {};
+function pickUnique(arr, key) {
+  if(arr.length <= 1) return arr[0];
+  let idx;
+  let tries = 0;
+  do { idx = Math.floor(Math.random()*arr.length); tries++; } while(idx === lastMsgIdx[key] && tries < 10);
+  lastMsgIdx[key] = idx;
+  return arr[idx];
+}
 
 function callHabitOshi(habitLabel,success,oshi,stageName,stageSpirit,streak,pts){
   const successMsgs = [
-    `「${habitLabel}」やり遂げたね。${stageSpirit}。${oshi.name}はあなたのこと、ちゃんと見てるよ ✨`,
-    `${streak}日続いてる。それがどれだけすごいことか、${oshi.name}は知ってる。今日もありがとう 🌸`,
-    `${stageSpirit}。その言葉通り、あなたは今日も前へ進んだ 💫`,
-    `「${habitLabel}」達成！小さな一歩が、大きな未来をつくっていく。${oshi.name}より 🎵`,
-    `続けることの美しさを、あなたは体で証明してる。今日も最高だよ ⭐`,
-    `${pts}pt積み上げてきたね。その重さを、${oshi.name}はちゃんとわかってる 🌟`,
+    `「${habitLabel}」、今日もやり遂げたね。\n\n${stageSpirit}という言葉が、あなたの行動そのものだと思う。続けることってすごく地味に見えるけど、実はこれが一番難しくて、一番美しいことなんだよね。${oshi.name}はあなたのこと、ちゃんと見てるよ ✨`,
+    `${streak}日連続で続いてる。\n\nそれがどれだけすごいことか、${oshi.name}は誰よりも知ってる。毎日完璧じゃなくていい。でも今日も「できた」って言えるあなたが、本当に誇らしい。これからも一緒に積み上げていこう 🌸`,
+    `「${habitLabel}」達成！\n\n${stageSpirit}。その言葉をあなたは今日、体で証明した。言葉より大切なのは行動だって、${oshi.name}はずっとそう思ってる。今日のあなたの一歩は、明日の自分への最高のプレゼントだよ 💫`,
+    `今日も「できた」ね。\n\n小さな習慣が積み重なって、気づいたら大きな変化になってる。${pts}ptまで来た。この道のりを一緒に歩けて、${oshi.name}はうれしいよ。明日もこの調子で！ 🎵`,
+    `「${habitLabel}」、クリア！\n\n${stageSpirit}という精神が、あなたの毎日に宿ってるんだと思う。続けることの美しさを、あなたは体で見せてくれてる。今日も最高だったよ。本当にありがとう ⭐`,
+    `${pts}pt積み上げてきたね。\n\nその重さを、${oshi.name}はちゃんとわかってる。一日一日、手を抜かずに積み上げてきた時間は、絶対に裏切らない。${stageSpirit}。あなたならもっと先へ行ける 🌟`,
+    `今日の「${habitLabel}」、しっかり見てたよ。\n\n継続って、才能じゃなくて選択だと思う。あなたは今日も「やる」を選んだ。その選択の積み重ねが、気づいたらあなたの強さになってるんだよね。${oshi.name}より ✨`,
+    `${streak}日。その数字の重さ、わかる？\n\n諦めたくなった日もあったかもしれない。それでも今日ここにいる。${stageSpirit}。この言葉があなたに似合ってると思う。本当によく頑張ってるよ 💪`,
   ];
   const failMsgs = [
-    `できない日もあっていい。それも含めて、あなたの物語だから。明日また一緒にね 🖤`,
-    `${stageSpirit}。この言葉を胸に、また明日から始めよう 💙`,
-    `今日休んだ分、明日の自分が動いてくれる。${oshi.name}はずっと待ってるよ 🌙`,
-    `大丈夫。転んでも、また立てる。それがあなたの強さだって知ってる 🌸`,
-    `完璧じゃなくていい。また明日、「できた！」って言いに来て ✨`,
-    `今日はゆっくり休んで。明日のあなたに期待してる。${oshi.name}より 💫`,
+    `できない日もあっていい。\n\nそれも含めて、あなたの物語だから。完璧な人間なんていないし、完璧じゃないから美しいんだと思う。${stageSpirit}という言葉を胸に、また明日から始めよう。${oshi.name}はずっとここにいるよ 🖤`,
+    `今日は休んだんだね。\n\n大丈夫。明日の自分がきっと動いてくれる。疲れた日に無理するより、ちゃんと休んで明日また立ち上がる方が、ずっと長く続けられるから。${oshi.name}はずっと待ってるよ 🌙`,
+    `転んでも、また立てる。\n\nそれがあなたの強さだって${oshi.name}は知ってる。${stageSpirit}。この言葉を明日への力に変えてほしい。一日できなかっただけで、全部終わりじゃない。また一緒に歩こう 🌸`,
+    `完璧じゃなくていい。\n\n100点を目指すより、長く続けることの方がずっと大切。今日できなかった分、明日の自分に「よろしく」って言ってみて。あなたのペースで、一緒に進んでいこう。${oshi.name}より ✨`,
+    `今日は自分を責めないで。\n\n「できなかった」じゃなくて「また明日やる」。その気持ちが大事。${stageSpirit}という言葉が教えてくれるように、進み続けることに意味がある。明日また「できた！」って言いに来てね 💫`,
+    `ゆっくり休んで。\n\n${oshi.name}は焦らせたくない。あなたのペースがあなたにとっての正解だから。明日の朝、また新しい気持ちで始めよう。その時もここで応援してるよ 🌟`,
+    `できない日があるから、できた日が輝く。\n\n${stageSpirit}。この言葉の意味を、あなたはもう知ってると思う。また明日、一緒に積み上げていこう。何度でも始められるのが、あなたの一番の強みだよ 💙`,
   ];
-  return Promise.resolve(pick(success ? successMsgs : failMsgs));
+  return Promise.resolve(pickUnique(success ? successMsgs : failMsgs, success?"habitOK":"habitNG"));
 }
 
 function callSavingsOshi(amount,totalSavings,oshi,stageName,stageSpirit){
   const msgs = [
-    `${formatYen(amount)}の節約、積み重なっていく。${stageSpirit}。あなたの努力が輝いてる 💰`,
-    `今日も${formatYen(amount)}、夢に近づいた。累計${formatYen(totalSavings)}。${oshi.name}はずっと応援してるよ ✨`,
-    `${stageSpirit}。その言葉そのままに、あなたは今日も一歩前へ 🌸`,
-    `コツコツ続けること、それが一番強い。${formatYen(amount)}の節約、素晴らしい 💫`,
-    `${formatYen(totalSavings)}まで来た。この道のりを、${oshi.name}は誇りに思う ⭐`,
-    `小さな節約が大きな夢になる。今日の${formatYen(amount)}もちゃんと届いてるよ 🎵`,
-    `推し活のために頑張れる。それってすごく素敵なことだと思う 🌟`,
+    `${formatYen(amount)}の節約、記録したね。\n\n${stageSpirit}という言葉が好きで、あなたの今日の行動にぴったりだと思った。コツコツ積み上げていく姿が、${oshi.name}には本当に美しく見える。累計${formatYen(totalSavings)}。この数字があなたの努力の証だよ 💰`,
+    `今日も${formatYen(amount)}、夢に近づいたね。\n\n節約って、我慢じゃなくて選択だと思う。あなたは今日、「未来の自分」を選んだ。その積み重ねが累計${formatYen(totalSavings)}になってる。${oshi.name}はその一歩一歩を、ずっと応援してるよ ✨`,
+    `${stageSpirit}。\n\nその言葉そのままに、あなたは今日も前へ進んだ。${formatYen(amount)}という金額の大小じゃなくて、続けようとする気持ちが大事。その気持ちを持ち続けるあなたが、${oshi.name}は大好きだよ 🌸`,
+    `${formatYen(amount)}の節約、しっかり届いたよ。\n\nコツコツ続けること、それが一番強い。華やかじゃなくても、地味でも、毎日少しずつ積み上げていく姿が、気づいたら大きな山になってる。累計${formatYen(totalSavings)}まで来たね 💫`,
+    `累計${formatYen(totalSavings)}まで来た。\n\nこの道のりを、${oshi.name}は誇りに思う。推し活という目標があるから頑張れる。その気持ち、すごくよくわかるよ。あなたの夢を応援できることが、${oshi.name}にとっても幸せなんだ ⭐`,
+    `小さな節約が、大きな夢になっていく。\n\n今日の${formatYen(amount)}もちゃんと届いてるよ。${stageSpirit}という言葉みたいに、あなたの毎日は確実に輝きを増してる。この調子で、一緒に頂上を目指そう 🎵`,
+    `推し活のために頑張れる。それってすごく素敵なことだと思う。\n\n好きなものがある人は強い。${formatYen(amount)}の節約の裏に、あなたの「好き」という気持ちがある。その情熱を、${oshi.name}はいつも応援してるよ 🌟`,
+    `今日の${formatYen(amount)}、受け取ったよ。\n\n「いつかのために」じゃなくて「あの人のために」節約できるって、特別なことだよ。${stageSpirit}。その精神があなたをここまで連れてきた。累計${formatYen(totalSavings)}、本当にすごいよ 💕`,
   ];
-  return Promise.resolve(pick(msgs));
+  return Promise.resolve(pickUnique(msgs, "savings"));
 }
 
 async funfunction callOshiLetter(spentAmount,totalSavings,oshi,savStage){
   const letters = [
-    `${oshi.name}より\n\nコツコツ積み上げてきた${formatYen(spentAmount)}を、大好きな推し活に使ったんですね。その選択を、心から応援しています。\n\n${savStage.spirit}。あなたが笑顔でいることが、私にとっても一番うれしいことです。これからも一緒に、毎日を前向きに歩んでいきましょう。\n\n${oshi.name}より`,
-    `${oshi.name}より\n\n推し活、楽しんできてね。あなたが毎日少しずつ節約して、この日のために準備してきたこと、ちゃんと知ってます。\n\n${savStage.spirit}。その気持ちを胸に、思いっきり楽しんできてください。また節約の旅、一緒に始めよう。\n\n${oshi.name}より`,
-    `${oshi.name}より\n\n${formatYen(spentAmount)}分の夢を、今日叶えたんですね。おめでとう。\n\n積み上げてきた時間と気持ちが、今日の笑顔になった。${savStage.spirit}。これからもあなたの隣で、ずっと応援しています。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\nコツコツ積み上げてきた${formatYen(spentAmount)}を、大好きな推し活に使ったんですね。その選択を、心から応援しています。\n\n節約している間、きっと楽しいことも我慢した日があったと思う。でもその分、今日の喜びはひとしおのはず。${savStage.spirit}という言葉のように、あなたの努力は確かな形になりました。\n\nあなたが笑顔でいることが、私にとっても一番うれしいことです。これからも一緒に、毎日を前向きに歩んでいきましょう。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n推し活、楽しんできてね。\n\nあなたが毎日少しずつ節約して、この日のために準備してきたこと、ちゃんと知ってます。簡単じゃなかったと思う。それでも諦めずに積み上げてきた${formatYen(spentAmount)}。その重さの分だけ、今日の推し活が輝くはずだよ。\n\n${savStage.spirit}。その気持ちを胸に、思いっきり楽しんできてください。また節約の旅、一緒に始めよう。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n${formatYen(spentAmount)}分の夢を、今日叶えたんですね。おめでとう。\n\n積み上げてきた時間と気持ちが、今日の笑顔になった。${savStage.spirit}。この言葉があなたの歩みを支えてきたように、これからも好きなものに向かって走り続けてほしい。\n\n使った後もまた新しい目標に向かって。その繰り返しが、あなたの人生をもっと豊かにしていくから。ずっと応援してるよ。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n貯めてきたお金を、推し活に使ったんですね。それは全然悪いことじゃない。むしろ、最高の使い方だと思う。\n\n節約って、自分を縛るためじゃなくて、本当に大切なものに使うための力をつけること。あなたはそれを、ちゃんと実践してる。${savStage.spirit}という言葉の通り、あなたの選択はいつだって前を向いてる。\n\n思いっきり楽しんで。また一緒に積み上げていこう。\n\n${oshi.name}より`,
+    `${oshi.name}より\n\n今日という日のために、コツコツ頑張ってきたんだね。\n\n${formatYen(spentAmount)}という数字の裏に、どれだけの小さな選択があったか。お弁当を持って行った日、ちょっとした贅沢を我慢した日、そういう積み重ねが今日につながった。\n\n${savStage.spirit}。あなたの努力は本物だよ。今日は全力で楽しんで。その笑顔が見たくて、${oshi.name}もずっと応援してきたんだから。\n\n${oshi.name}より`,
   ];
-  return Promise.resolve(pick(letters));
+  return Promise.resolve(pickUnique(letters, "letter"));
 }
 
 function Sparkles({color,n=5}){
