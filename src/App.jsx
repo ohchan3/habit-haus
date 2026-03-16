@@ -117,7 +117,7 @@ function callSavingsOshi(amount,totalSavings,oshi,stageName,stageSpirit){
   return Promise.resolve(pickUnique(msgs, "savings"));
 }
 
-async funfunction callOshiLetter(spentAmount,totalSavings,oshi,savStage){
+function callOshiLetter(spentAmount,totalSavings,oshi,savStage){
   const letters = [
     `${oshi.name}より\n\nコツコツ積み上げてきた${formatYen(spentAmount)}を、大好きな推し活に使ったんですね。その選択を、心から応援しています。\n\n節約している間、きっと楽しいことも我慢した日があったと思う。でもその分、今日の喜びはひとしおのはず。${savStage.spirit}という言葉のように、あなたの努力は確かな形になりました。\n\nあなたが笑顔でいることが、私にとっても一番うれしいことです。これからも一緒に、毎日を前向きに歩んでいきましょう。\n\n${oshi.name}より`,
     `${oshi.name}より\n\n推し活、楽しんできてね。\n\nあなたが毎日少しずつ節約して、この日のために準備してきたこと、ちゃんと知ってます。簡単じゃなかったと思う。それでも諦めずに積み上げてきた${formatYen(spentAmount)}。その重さの分だけ、今日の推し活が輝くはずだよ。\n\n${savStage.spirit}。その気持ちを胸に、思いっきり楽しんできてください。また節約の旅、一緒に始めよう。\n\n${oshi.name}より`,
